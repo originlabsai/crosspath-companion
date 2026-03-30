@@ -10,12 +10,12 @@ The companion runs as a lightweight background daemon on your machine. It bridge
 
 **Linux / macOS**
 ```bash
-curl -fsSL https://get.crosspath.im/companion | bash
+curl -fsSL https://crosspath.im/companion | bash
 ```
 
 **Windows (PowerShell)**
 ```powershell
-irm https://get.crosspath.im/companion/windows | iex
+irm https://crosspath.im/companion/windows | iex
 ```
 
 ---
