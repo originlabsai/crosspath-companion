@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.25'
 
       - name: Build all platforms
         run: |
@@ -31,6 +31,9 @@ jobs:
           GOOS=darwin  GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/cross_companion-darwin-amd64  ./cmd/cross_companion
           GOOS=darwin  GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/cross_companion-darwin-arm64  ./cmd/cross_companion
           GOOS=windows GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/cross_companion-windows-amd64.exe ./cmd/cross_companion
+
+      - name: Generate checksums
+        run: cd dist && sha256sum cross_companion-* > checksums.txt
 
       - name: Create release
         uses: softprops/action-gh-release@v2

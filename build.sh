@@ -63,24 +63,29 @@ fi
 mkdir -p bin
 
 # Windows
-echo "[1/4] Building for Windows (amd64)..."
+echo "[1/5] Building for Windows (amd64)..."
 GOOS=windows GOARCH=amd64 $GO_BIN build -ldflags "$LDFLAGS" -o bin/cross_companion-windows-amd64.exe ./cmd/cross_companion
 echo "✓ Windows build complete"
 
 # Linux
-echo "[2/4] Building for Linux (amd64)..."
+echo "[2/5] Building for Linux (amd64)..."
 GOOS=linux GOARCH=amd64 $GO_BIN build -ldflags "$LDFLAGS" -o bin/cross_companion-linux-amd64 ./cmd/cross_companion
 echo "✓ Linux build complete"
 
 # macOS Intel
-echo "[3/4] Building for macOS (amd64)..."
+echo "[3/5] Building for macOS (amd64)..."
 GOOS=darwin GOARCH=amd64 $GO_BIN build -ldflags "$LDFLAGS" -o bin/cross_companion-darwin-amd64 ./cmd/cross_companion
 echo "✓ macOS build complete"
 
 # macOS Apple Silicon
-echo "[4/4] Building for macOS (arm64)..."
+echo "[4/5] Building for macOS (arm64)..."
 GOOS=darwin GOARCH=arm64 $GO_BIN build -ldflags "$LDFLAGS" -o bin/cross_companion-darwin-arm64 ./cmd/cross_companion
 echo "✓ macOS ARM build complete"
+
+# Linux ARM64
+echo "[5/5] Building for Linux (arm64)..."
+GOOS=linux GOARCH=arm64 $GO_BIN build -ldflags "$LDFLAGS" -o bin/cross_companion-linux-arm64 ./cmd/cross_companion
+echo "✓ Linux ARM build complete"
 
 echo ""
 echo "========================================"

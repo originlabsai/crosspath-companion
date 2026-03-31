@@ -69,11 +69,6 @@ detect_os_arch() {
     *) error "Unsupported architecture: $ARCH" ;;
   esac
 
-  # Validate supported combinations
-  if [[ "$OS" == "linux" && "$ARCH" == "arm64" ]]; then
-    error "Linux ARM64 not currently supported. Please use x86_64."
-  fi
-
   info "Detected: $OS/$ARCH"
 }
 
