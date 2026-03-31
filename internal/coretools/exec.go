@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -71,7 +70,7 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]interface{}) (st
 	// When the companion runs with elevated privileges (e.g. via sudo),
 	// sudo is unnecessary and can cause issues (e.g. prompting for password
 	// in a non-interactive shell). Strip it transparently.
-	if os.Getuid() == 0 {
+	if isRunningAsRoot() {
 		command = stripSudo(command)
 	}
 

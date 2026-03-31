@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -119,7 +118,7 @@ func (t *RunBackgroundTool) start(args map[string]interface{}) (string, error) {
 	}
 
 	// Auto-strip sudo when running as root
-	if os.Getuid() == 0 {
+	if isRunningAsRoot() {
 		command = stripSudo(command)
 	}
 
@@ -140,7 +139,7 @@ func (t *RunBackgroundTool) start(args map[string]interface{}) (string, error) {
 	}
 
 	// Detach from process group so it survives if the companion exits
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	setSysProcAttr(cmd)
 
 	// Discard stdout/stderr to prevent pipe blocking
 	// The process runs independently — logs go to its own stdout
@@ -236,7 +235,7 @@ func (t *RunBackgroundTool) stop(args map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("cannot find process %d: %w", pid, err)
 	}
 
-	if err := proc.Signal(syscall.SIGTERM); err != nil {
+	if err := terminateProcess(proc); err != nil {
 		// Process may already be gone
 		if tracked {
 			t.mu.Lock()
@@ -256,14 +255,14 @@ func (t *RunBackgroundTool) stop(args map[string]interface{}) (string, error) {
 		}
 	} else {
 		time.Sleep(1 * time.Second)
-		if err := proc.Signal(syscall.Signal(0)); err != nil {
+		if !isProcessAlive(proc) {
 			exited = true
 		}
 	}
 
 	if !exited {
 		// Force kill
-		proc.Signal(syscall.SIGKILL)
+		forceKillProcess(proc)
 		if tracked {
 			select {
 			case <-bp.done:
@@ -271,9 +270,6 @@ func (t *RunBackgroundTool) stop(args map[string]interface{}) (string, error) {
 			}
 		}
 	}
-
-	// Also kill the entire process group (catches child processes like node)
-	syscall.Kill(-pid, syscall.SIGKILL)
 
 	if tracked {
 		t.mu.Lock()

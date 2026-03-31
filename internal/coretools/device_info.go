@@ -72,7 +72,7 @@ func (t *DeviceInfoTool) Execute(_ context.Context, _ map[string]interface{}) (s
 	}
 
 	// Elevated privileges
-	isRoot := os.Getuid() == 0
+	isRoot := isRunningAsRoot()
 	fmt.Fprintf(&sb, "Elevated:      %v\n", isRoot)
 
 	// Working directory

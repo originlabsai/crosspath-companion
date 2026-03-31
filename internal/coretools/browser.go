@@ -14,7 +14,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/crosspath/mcp-client/internal/config"
@@ -32,14 +31,7 @@ func CleanupLaunchedChrome() {
 	}
 	log.Printf("[BROWSER] Cleaning up auto-launched Chrome (PID %d)", cmd.Process.Pid)
 	// Kill the entire process group
-	syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
-	done := make(chan struct{})
-	go func() { cmd.Wait(); close(done) }()
-	select {
-	case <-done:
-	case <-time.After(5 * time.Second):
-		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-	}
+	killProcessGroupForCleanup(cmd.Process.Pid)
 	launchedChromeCmd = nil
 }
 
@@ -378,19 +370,9 @@ func cleanupChromeLocks() {
 // killOrphanedChrome kills Chrome/Chromium processes that might be holding
 // locks on the profile directory.
 func killOrphanedChrome() {
-	// Use pkill to find Chrome processes with the MCP profile directory
-	patterns := []string{
-		"chrome-devtools-mcp/chrome-profile",
-	}
-
-	for _, pattern := range patterns {
-		cmd := exec.Command("pkill", "-f", pattern)
-		if err := cmd.Run(); err == nil {
-			log.Printf("[BROWSER] Killed orphaned Chrome processes matching: %s", pattern)
-			// Give processes time to die
-			time.Sleep(500 * time.Millisecond)
-		}
-	}
+	killOrphanedChromeProcesses()
+	log.Printf("[BROWSER] Attempted to kill orphaned Chrome processes")
+	time.Sleep(500 * time.Millisecond)
 }
 
 // CleanupOnStartup should be called during daemon initialization to
@@ -439,7 +421,7 @@ func EnsureBrowserReadyWithConfig(profilePath string, port int) bool {
 		"--no-first-run",
 		"--no-default-browser-check",
 	)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	setSysProcAttr(cmd)
 
 	if err := cmd.Start(); err != nil {
 		log.Printf("[BROWSER] Failed to launch Chrome: %v", err)
@@ -473,8 +455,7 @@ func IsPortOpen(host string, port int) bool {
 
 // IsChromeRunning checks if any Chrome process is already running.
 func IsChromeRunning() bool {
-	out, _ := exec.Command("pgrep", "-x", "chrome").Output()
-	return len(strings.TrimSpace(string(out))) > 0
+	return isChromeProcessRunning()
 }
 
 // FindChromeBinary locates the Chrome/Chromium executable on the system.
