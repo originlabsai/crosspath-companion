@@ -1,3 +1,13 @@
+```
+ ██████╗██████╗  ██████╗ ███████╗███████╗██████╗  █████╗ ████████╗██╗  ██╗
+██╔════╝██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║  ██║
+██║     ██████╔╝██║   ██║███████╗███████╗██████╔╝███████║   ██║   ███████║
+██║     ██╔══██╗██║   ██║╚════██║╚════██║██╔═══╝ ██╔══██║   ██║   ██╔══██║
+╚██████╗██║  ██║╚██████╔╝███████║███████║██║     ██║  ██║   ██║   ██║  ██║
+ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+                              C O M P A N I O N
+```
+
 # CrossPath Companion
 
 Connect your local computer to [CrossPath](https://crosspath.im) — your private AI workspace.
@@ -10,12 +20,12 @@ The companion runs as a lightweight background daemon on your machine. It bridge
 
 **Linux / macOS**
 ```bash
-curl -fsSL https://crosspath.im/companion | bash
+curl -fsSL https://raw.githubusercontent.com/originlabsai/crosspath-companion/main/scripts/install.sh | sh
 ```
 
 **Windows (PowerShell)**
 ```powershell
-irm https://crosspath.im/companion/windows | iex
+irm https://raw.githubusercontent.com/originlabsai/crosspath-companion/main/scripts/install.ps1 | iex
 ```
 
 ---
@@ -23,7 +33,7 @@ irm https://crosspath.im/companion/windows | iex
 ## First-Time Setup
 
 ```bash
-cross_companion login     # opens browser → sign in to CrossPath → saves token
+cross_companion login     # opens browser -> sign in to CrossPath -> saves token
 cross_companion start     # starts the daemon and connects to CrossPath
 cross_companion status    # verify it's connected
 ```
@@ -78,7 +88,7 @@ You can also connect any third-party **MCP server** (filesystem, databases, VS C
 
 ## File Access Transparency
 
-Every file and tool access is logged. View the full history in your CrossPath dashboard under **Settings → Companion → File Access Log**.
+Every file and tool access is logged. View the full history in your CrossPath dashboard under **Settings > Companion > File Access Log**.
 
 The log shows:
 - Which file or command was accessed
@@ -122,12 +132,12 @@ go build -o cross_companion ./cmd/cross_companion
 
 ```
 Your Computer                      CrossPath Cloud
-──────────────────────             ──────────────────────
-cross_companion (daemon)  ←─WSS─→  crosspath.im/mcp/connect
-  ├─ 11 built-in tools              │
-  ├─ local MCP servers              └─ web chat routes tool
-  └─ file access log                   calls here
-       ↕ streamed to cloud
+--------------------------        --------------------------
+cross_companion (daemon)  <--WSS-->  crosspath.im/mcp/connect
+  |-- 11 built-in tools              |
+  |-- local MCP servers              +-- web chat routes tool
+  +-- file access log                    calls here
+       ^ streamed to cloud
 ```
 
 The companion connects to CrossPath over a persistent WebSocket. Tool calls flow from your browser session through the cloud, down to the companion, executed locally, and results returned — all in real time.
