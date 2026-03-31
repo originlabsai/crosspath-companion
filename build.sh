@@ -11,7 +11,7 @@ set -e
 
 MODE="${1:-prod}"
 PKG="github.com/crosspath/mcp-client/internal/config"
-VERSION="0.1.5"
+VERSION="0.1.6"
 
 # Find Go binary — snap Go can fail with apparmor, use direct path as fallback
 GO_BIN="go"
